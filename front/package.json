@@ -1,0 +1,24 @@
+{
+  "name": "react-nodebird-front",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next"
+  },
+  "author": "minbr0ther",
+  "license": "ISC",
+  "dependencies": {
+    "@ant-design/icons": "^4.7.0",
+    "antd": "^4.19.2",
+    "next": "^9.5.5",
+    "prop-types": "^15.8.1",
+    "styled-components": "^5.3.3"
+  },
+  "devDependencies": {
+    "eslint": "^7.1.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-react": "^7.20.2",
+    "eslint-plugin-react-hooks": "^4.0.4"
+  }
+}
