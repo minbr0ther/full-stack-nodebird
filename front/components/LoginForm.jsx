@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Button, Form, Input } from "antd";
 import Link from "next/link";
 import React, { useState, useCallback } from "react";
@@ -7,7 +8,11 @@ const ButtonWrapper = styled.div`
   margin-top: 10px;
 `;
 
-const LoginForm = () => {
+const FormWrapper = styled(Form)`
+  padding: 10px;
+`;
+
+const LoginForm = ({ setIsLoggedIn }) => {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
 
@@ -19,8 +24,14 @@ const LoginForm = () => {
     setPassword(e.target.value);
   }, []);
 
+  const onSubmitForm = useCallback(() => {
+    // e.preventDefault(); antd에는 이미 적용되어 있다
+    console.log(id, password);
+    setIsLoggedIn(true);
+  }, [id, password]);
+
   return (
-    <Form>
+    <FormWrapper onFinish={onSubmitForm}>
       <div>
         <label htmlFor="user-id">아이디</label>
         <br />
@@ -47,7 +58,7 @@ const LoginForm = () => {
           </a>
         </Link>
       </ButtonWrapper>
-    </Form>
+    </FormWrapper>
   );
 };
 
