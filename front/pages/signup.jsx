@@ -16,10 +16,14 @@ const Signup = () => {
   const [password, onChangePassword] = useInput("");
   const [passwordCheck, setPasswordCheck] = useState("");
   const [passwordError, setPasswordError] = useState(false);
-  const onChangePasswordCheck = useCallback((e) => {
-    setPasswordCheck(e.target.value);
-    setPasswordError(e.target.value !== password);
-  }, []);
+  const onChangePasswordCheck = useCallback(
+    (e) => {
+      setPasswordCheck(e.target.value);
+      setPasswordError(e.target.value !== password);
+      console.log(`e.target.value ${e.target.value}, password ${password}`);
+    },
+    [password]
+  );
 
   const [term, setTerm] = useState("");
   const [termError, setTermError] = useState(false);
@@ -32,7 +36,9 @@ const Signup = () => {
     if (password !== passwordCheck) return setPasswordError(true);
 
     if (!term) return setTermError(true);
-  }, []);
+
+    console.log(id, nickname, password);
+  }, [password, passwordCheck, term]);
 
   return (
     <AppLayout>
@@ -67,7 +73,7 @@ const Signup = () => {
           />
         </div>
         <div>
-          <label htmlFor="user-password-check">비밀번호</label>
+          <label htmlFor="user-password-check">비밀번호 확인</label>
           <br />
           <Input
             name="user-password-check"
