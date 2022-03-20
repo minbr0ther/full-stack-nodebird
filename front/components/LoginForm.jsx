@@ -3,7 +3,7 @@ import Link from 'next/link';
 import React, { useState, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { loginAction } from '../pages/reducers';
+import { loginAction } from '../reducers';
 
 const ButtonWrapper = styled.div`
   margin-top: 10px;
