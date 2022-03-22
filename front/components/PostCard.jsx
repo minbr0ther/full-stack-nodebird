@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { Button, Card, Popover, Avatar } from 'antd';
+import { Button, Card, Popover, Avatar, List, Comment } from 'antd';
 import PropTypes from 'prop-types';
 import React, { useState, useCallback } from 'react';
 import {
@@ -11,6 +11,7 @@ import {
 } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
 import PostImages from './PostImages';
+import CommendForm from './CommentForm';
 
 const PostCard = ({ post }) => {
   const [liked, setLiked] = useState(false);
@@ -66,14 +67,31 @@ const PostCard = ({ post }) => {
           description={post.content}
         />
       </Card>
-      {commentFormOpened && <div>댓글 부분</div>}
-      {/* <CommendForm />
-      <Comments /> */}
+      {commentFormOpened && (
+        <div>
+          {/* 게시글의 id가 필요하기 때문에 post를 넘겨줌 */}
+          <CommendForm post={post} />
+          <List
+            header={`${post.Comments.length}개의 댓글`}
+            itemLayout="horizontal"
+            dataSource={post.Comments}
+            renderItem={(item) => (
+              <li>
+                <Comment
+                  author={item.User.nickname}
+                  avatar={<Avatar>{item.User.nickname[0]}</Avatar>}
+                  content={item.content}
+                />
+              </li>
+            )}
+          />
+        </div>
+      )}
     </div>
   );
 };
 
-PostCard.PropTypes = {
+PostCard.propTypes = {
   post: PropTypes.shape({
     id: PropTypes.number,
     User: PropTypes.object,
