@@ -9,13 +9,13 @@ export const initialState = {
       content: '첫 번째 게시글 #해시태그 #익스프레스',
       Images: [
         {
-          src: 'https://picsum.photos/200/300',
+          src: 'https://picsum.photos/id/1/400/600',
         },
         {
-          src: 'https://picsum.photos/200/300',
+          src: 'https://picsum.photos/id/2/400/600',
         },
         {
-          src: 'https://picsum.photos/200/300',
+          src: 'https://picsum.photos/id/3/400/600',
         },
       ],
       Comments: [
