@@ -1,9 +1,11 @@
 import { Button, Form, Input } from 'antd';
 import Link from 'next/link';
-import React, { useState, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { loginAction } from '../reducers/user';
+
+import useInput from '../hooks/useInput';
+import { loginRequestAction } from '../reducers/user';
 
 const ButtonWrapper = styled.div`
   margin-top: 10px;
@@ -15,21 +17,13 @@ const FormWrapper = styled(Form)`
 
 const LoginForm = () => {
   const dispatch = useDispatch();
-  const [id, setId] = useState('');
-  const [password, setPassword] = useState('');
-
-  const onChangeId = useCallback((e) => {
-    setId(e.target.value);
-  }, []);
-
-  const onChangePassword = useCallback((e) => {
-    setPassword(e.target.value);
-  }, []);
+  const { isLoggingIn } = useSelector((state) => state.user);
+  const [id, onChangeId] = useInput();
+  const [password, onChangePassword] = useInput();
 
   const onSubmitForm = useCallback(() => {
-    // e.preventDefault(); antd에는 이미 적용되어 있다
-    console.log(id, password);
-    dispatch(loginAction({ id, password }));
+    // e.preventDefault(); antd에는 이미 적용되어 있다;
+    dispatch(loginRequestAction({ id, password }));
   }, [id, password]);
 
   return (
@@ -51,7 +45,7 @@ const LoginForm = () => {
         />
       </div>
       <ButtonWrapper>
-        <Button type="primary" htmlType="submit" loading={false}>
+        <Button type="primary" htmlType="submit" loading={isLoggingIn}>
           로그인
         </Button>
         <Link href="/signup">
