@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { Button, Card, Popover, Avatar, List, Comment } from 'antd';
 import PropTypes from 'prop-types';
 import React, { useState, useCallback } from 'react';

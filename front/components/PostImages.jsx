@@ -1,3 +1,4 @@
+/* eslint-disable react/require-default-props */
 /* eslint-disable no-unused-vars */
 import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';

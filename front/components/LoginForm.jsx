@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
 import { Button, Form, Input } from 'antd';
 import Link from 'next/link';
 import React, { useCallback } from 'react';
