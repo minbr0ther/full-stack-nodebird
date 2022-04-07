@@ -12,13 +12,13 @@ import {
 //   return axios.post('/api/post', data);
 // }
 
-function* addPost() {
+function* addPost(action) {
   try {
     yield delay(1000);
     // const result = yield call(addPostAPI, action.data);
     yield put({
       type: ADD_POST_SUCCESS,
-      // data: result.data,
+      data: action.data,
     });
   } catch (err) {
     yield put({
@@ -31,13 +31,13 @@ function* addPost() {
 //   return axios.post(`/api/post/${data.postId}/comment`, data);
 // }
 
-function* addComment() {
+function* addComment(action) {
   try {
     yield delay(1000);
     // const result = yield call(addCommentAPI, action.data);
     yield put({
       type: ADD_COMMENT_SUCCESS,
-      // data: result.data,
+      data: action.data,
     });
   } catch (err) {
     yield put({
