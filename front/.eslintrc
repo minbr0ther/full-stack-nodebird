@@ -33,6 +33,7 @@
     "default-param-last": "off",
     "implicit-arrow-linebreak": "off",
     "no-param-reassign": "off",
-    "consistent-return": "off"
+    "consistent-return": "off",
+    "operator-linebreak": "off"
   }
 }
