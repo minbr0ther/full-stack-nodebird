@@ -1,4 +1,5 @@
 const express = require('express');
+const postRouter = require('./routes/post');
 
 const app = express();
 
@@ -18,9 +19,7 @@ app.get('/api/posts', (req, res) => {
   ]);
 });
 
-app.post('/api/post', (req, res) => {});
-
-app.delete('/api/post', (req, res) => {});
+app.use('/post', postRouter); // 라우터 분리!
 
 app.listen(3065, () => {
   console.log('서버 실행 중');
