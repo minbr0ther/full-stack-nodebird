@@ -1,8 +1,16 @@
 const express = require('express');
 const cors = require('cors');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const passport = require('passport');
+const dotenv = require('dotenv');
+
 const postRouter = require('./routes/post');
 const userRouter = require('./routes/user');
 const db = require('./models');
+const passportConfig = require('./passport');
+
+dotenv.config(); // dotenv 활성화
 const app = express();
 
 // sequelize에 연결
@@ -13,13 +21,27 @@ db.sequelize
   })
   .catch(console.error);
 
-app.use(cors()); // 모든 요청에 대해서 cors 허용
+passportConfig();
+
 // use의 뜻 => express 서버에 '미들웨어'를 장착
-// json => json형식을 req.body에 넣어주는 역할
-// urlencoded => (보통 form data) req.body에 넣어주는 역할
 // 🚨 약간 import 느낌이라 상단에 적어주는게 좋음
+app.use(cors()); // 모든 요청에 대해서 cors 허용
+// json => json형식을 req.body에 넣어주는 역할
 app.use(express.json());
+// urlencoded => (보통 form data) req.body에 넣어주는 역할
 app.use(express.urlencoded({ extended: true }));
+
+app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(
+  session({
+    saveUninitialized: false,
+    resave: false,
+    // 이것을 해킹 당하면 해시를 복원할 수 있다 (위험)
+    secret: process.env.COOKIE_SECRET,
+  }),
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.get('/', (req, res) => {
   res.send('hello express');

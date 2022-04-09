@@ -1,8 +1,33 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const passport = require('passport');
 const { User } = require('../models');
 
 const router = express.Router();
+
+router.post('/login', (req, res, next) => {
+  // 미들 웨어 확장 😱 - 서버에러, 성공, 클라이언트 에러
+  passport.authenticate('local', (err, user, info) => {
+    if (err) {
+      console.error(err);
+      return next(error);
+    }
+    if (info) {
+      // client 에러, 401: 허가되지 않음(로그인)
+      return res.status('401').send(info.reason);
+    }
+
+    return req.login(user, async (loginErr) => {
+      if (loginErr) {
+        // 에러날 일 없지만 혹시나
+        console.error(loginErr);
+        return next(loginErr);
+      }
+
+      return res.status(200).json(user);
+    });
+  })(req, res, next);
+});
 
 router.post('/', async (req, res, next) => {
   try {
@@ -38,6 +63,12 @@ router.post('/', async (req, res, next) => {
     console.error(err);
     next(err); // express가 error을 front한테 알려줌
   }
+});
+
+router.post('/user/logout', (req, res) => {
+  req.logout();
+  req.session.destroy();
+  res.send('ok');
 });
 
 module.exports = router;
