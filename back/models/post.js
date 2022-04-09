@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     // 게시글은 사람에게 속해있다
     db.Post.belongsTo(db.User);
     // 다 대 다 관계
-    db.Post.belongsToMany(db.Hashtag);
+    db.Post.belongsToMany(db.Hashtag, { through: 'PostHashtag' });
     // 게시글은 댓글을 여러개 가진다
     db.Post.hasMany(db.Comment);
     // 게시글은 이미지를 여러개 가진다
