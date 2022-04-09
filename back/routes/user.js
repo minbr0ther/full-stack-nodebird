@@ -30,6 +30,9 @@ router.post('/', async (req, res, next) => {
       password: hashedPassword,
     });
 
+    // npm i cors로 대체 😂
+    // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3060');
+
     res.status(201).send('ok');
   } catch (err) {
     console.error(err);

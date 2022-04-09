@@ -1,11 +1,15 @@
+/* eslint-disable no-alert */
+/* eslint-disable jsx-a11y/label-has-associated-control */
 import { Button, Checkbox, Form, Input } from 'antd';
 import Head from 'next/head';
-import React, { useState, useCallback } from 'react';
-import AppLayout from '../components/AppLayout';
-import useInput from '../components/hooks/useInput';
+import React, { useState, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
-import { SIGN_UP_REQUEST } from '../reducers/user';
 import { useDispatch, useSelector } from 'react-redux';
+import Router from 'next/router';
+
+import AppLayout from '../components/AppLayout';
+import useInput from '../hooks/useInput';
+import { SIGN_UP_REQUEST } from '../reducers/user';
 
 const ErrorMessage = styled.div`
   color: red;
@@ -13,7 +17,21 @@ const ErrorMessage = styled.div`
 
 const Signup = () => {
   const dispatch = useDispatch();
-  const { signUpLoading } = useSelector((state) => state.user);
+  const { signUpLoading, signUpDone, signUpError } = useSelector(
+    (state) => state.user,
+  );
+
+  useEffect(() => {
+    if (signUpDone) {
+      Router.push('/');
+    }
+  }, [signUpDone]);
+
+  useEffect(() => {
+    if (signUpError) {
+      alert(signUpError);
+    }
+  }, [signUpError]);
 
   const [email, onChangeEmail] = useInput('');
   const [nickname, onChangeNickname] = useInput('');
@@ -27,7 +45,7 @@ const Signup = () => {
       setPasswordError(e.target.value !== password);
       console.log(`e.target.value ${e.target.value}, password ${password}`);
     },
-    [password]
+    [password],
   );
 
   const [term, setTerm] = useState('');
@@ -79,6 +97,7 @@ const Signup = () => {
           <br />
           <Input
             name="user-password"
+            type="password"
             value={password}
             required
             onChange={onChangePassword}
@@ -89,6 +108,7 @@ const Signup = () => {
           <br />
           <Input
             name="user-password-check"
+            type="password"
             value={passwordCheck}
             required
             onChange={onChangePasswordCheck}
