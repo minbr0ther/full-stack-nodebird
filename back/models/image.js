@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
       collate: 'utf8_general_ci', // 이모티콘 저장
     },
   );
-  Image.associate = (db) => {};
+  Image.associate = (db) => {
+    // 이미지는 게시물에 속한다
+    db.Image.belongsTo(db.Post);
+  };
   return Image;
 };

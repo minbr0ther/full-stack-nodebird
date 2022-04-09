@@ -15,6 +15,19 @@ module.exports = (sequelize, DataTypes) => {
       collate: 'utf8mb4_general_ci', // 이모티콘 저장
     },
   );
-  Post.associate = (db) => {};
+  Post.associate = (db) => {
+    // 게시글은 사람에게 속해있다
+    db.Post.belongsTo(db.User);
+    // 다 대 다 관계
+    db.Post.belongsToMany(db.Hashtag);
+    // 게시글은 댓글을 여러개 가진다
+    db.Post.hasMany(db.Comment);
+    // 게시글은 이미지를 여러개 가진다
+    db.Post.hasMany(db.Image);
+    // 게시물과 사용자의 다대다 관계
+    // 'Likers'로 db.User의 이름을 변경해준다 (헷갈리지 말라고)
+    db.Post.belongsToMany(db.User, { through: 'Like', as: 'Likers' });
+    db.Post.belongsTo(db.Post), { as: 'Retweet' };
+  };
   return Post;
 };
