@@ -83,10 +83,11 @@ const reducer = (state = initialState, action) => {
       case FOLLOW_REQUEST:
         draft.followLoading = true;
         draft.followError = null;
+        draft.followDone = false;
         break;
       case FOLLOW_SUCCESS:
         draft.followLoading = false;
-        draft.isLoggedIn = true;
+        draft.followDone = true;
         draft.me.Followings.push({ id: action.data });
         break;
       case FOLLOW_FAILURE:
@@ -96,10 +97,11 @@ const reducer = (state = initialState, action) => {
       case UNFOLLOW_REQUEST:
         draft.unfollowLoading = true;
         draft.unfollowError = null;
+        draft.unfollowDone = false;
         break;
       case UNFOLLOW_SUCCESS:
         draft.unfollowLoading = false;
-        draft.isLoggedIn = true;
+        draft.unfollowDone = true;
         draft.me.Followings = draft.me.Followings.filter(
           (v) => v.id !== action.data,
         );
@@ -111,11 +113,12 @@ const reducer = (state = initialState, action) => {
       case LOG_IN_REQUEST:
         draft.logInLoading = true;
         draft.logInError = null;
+        draft.logInDone = false;
         break;
       case LOG_IN_SUCCESS:
         draft.logInLoading = false;
-        draft.isLoggedIn = true;
         draft.me = action.data;
+        draft.logInDone = true;
         break;
       case LOG_IN_FAILURE:
         draft.logInLoading = false;
@@ -123,12 +126,12 @@ const reducer = (state = initialState, action) => {
         break;
       case LOG_OUT_REQUEST:
         draft.logOutLoading = true;
-        draft.logOutDone = false;
         draft.logOutError = null;
+        draft.logOutDone = false;
         break;
       case LOG_OUT_SUCCESS:
         draft.logOutLoading = false;
-        draft.logOutdone = true;
+        draft.logOutDone = true;
         draft.me = null;
         break;
       case LOG_OUT_FAILURE:

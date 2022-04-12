@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
-const { User } = require('../models');
+const { User, Post } = require('../models');
 
 const router = express.Router();
 
@@ -10,7 +10,7 @@ router.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err) {
       console.error(err);
-      return next(error);
+      return next(error); // express가 에러처리하게 보내버림
     }
     if (info) {
       // client 에러, 401: 허가되지 않음(로그인)
@@ -24,7 +24,33 @@ router.post('/login', (req, res, next) => {
         return next(loginErr);
       }
 
-      return res.status(200).json(user);
+      // 비밀번호 빼고 모든 정보를 갖고 있는 user
+      const fullUserWithoutPassword = await User.findOne({
+        where: { id: user.id },
+
+        // 원하는 정보만 가져온다 (비밀번호 제외)
+        // attributes: ['id', 'nickname', 'email'],
+        attributes: { exclude: ['password'] },
+
+        // user에 저장할 추가 테이블 (작성한 게시물, 팔로잉, 팔로워)
+        include: [
+          {
+            model: Post,
+          },
+          {
+            model: User,
+            as: 'Followings',
+          },
+          {
+            model: User,
+            as: 'Followers',
+          },
+        ],
+      });
+
+      // 여기서 쿠키를 보내줌
+      // ex) res.setHeader('Cookie', 'cxlhy')
+      return res.status(200).json(fullUserWithoutPassword);
     });
   })(req, res, next);
 });
@@ -65,7 +91,7 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-router.post('/user/logout', (req, res) => {
+router.post('/logout', (req, res) => {
   req.logout();
   req.session.destroy();
   res.send('ok');
