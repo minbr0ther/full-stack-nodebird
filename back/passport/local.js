@@ -1,6 +1,6 @@
 const passport = require('passport');
 
-// 구조분해 할당으로 이름 변경
+// 로컬 로그인 전략 - 구조분해 할당으로 이름 변경
 const { Strategy: LocalStrategy } = require('passport-local');
 const bcrypt = require('bcrypt');
 const { User } = require('../models');
@@ -9,9 +9,10 @@ module.exports = () => {
   passport.use(
     new LocalStrategy(
       {
-        usernameField: 'email',
-        passwordField: 'password',
+        usernameField: 'email', // req.body.email
+        passwordField: 'password', // rep.body.password
       },
+      // 로그인을 위한 전략
       async (email, password, done) => {
         try {
           // 일치하는 이메일 같은 것이 있는지 검사

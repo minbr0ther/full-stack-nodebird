@@ -34,9 +34,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(
   session({
+    // 딱히 tru로 쓸 필요 없음
     saveUninitialized: false,
     resave: false,
     // 이것을 해킹 당하면 해시를 복원할 수 있다 (위험)
+    // 쿠키에 랜덤한 문자열을 보내줄때 사용하는 것
     secret: process.env.COOKIE_SECRET,
   }),
 );

@@ -9,9 +9,10 @@ module.exports = () => {
     done(null, user.id);
   });
 
-  // 저장해둔 아이디를 통해 다시 정보들 불러오기
+  // 저장해둔 아이디를 통해 다시 정보(pw, email)들 불러오기
   passport.deserializeUser(async (id, done) => {
     try {
+      // db에서 id로 정보를 불러온다
       const user = await User.findOne({ where: { id } });
       done(null, user);
     } catch (err) {

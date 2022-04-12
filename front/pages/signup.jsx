@@ -17,9 +17,18 @@ const ErrorMessage = styled.div`
 
 const Signup = () => {
   const dispatch = useDispatch();
-  const { signUpLoading, signUpDone, signUpError } = useSelector(
+  const { signUpLoading, signUpDone, signUpError, me } = useSelector(
     (state) => state.user,
   );
+
+  // 이미 로그인 되어있는 상태라면
+  useEffect(() => {
+    if (me && me.id) {
+      // push는 돌아가기
+      // replace는 아에 사라지게함
+      Router.replace('/');
+    }
+  }, [me && me.id]);
 
   useEffect(() => {
     if (signUpDone) {
