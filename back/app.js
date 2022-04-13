@@ -64,6 +64,8 @@ app.get('/api/posts', (req, res) => {
 app.use('/post', postRouter); // 라우터 분리!
 app.use('/user', userRouter); // 라우터 분리!
 
+// 에러처리 미들웨어 자리
+
 app.listen(3065, () => {
   console.log('서버 실행 중');
 });
