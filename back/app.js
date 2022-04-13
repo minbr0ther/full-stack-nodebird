@@ -27,7 +27,7 @@ passportConfig();
 // 🚨 약간 import 느낌이라 상단에 적어주는게 좋음
 app.use(
   cors({
-    origin: 'http://localhost:3060',
+    origin: 'http://localhost:3000',
     credentials: true,
   }),
 ); // 모든 요청에 대해서 cors 허용

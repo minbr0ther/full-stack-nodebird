@@ -6,6 +6,44 @@ const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 
 const router = express.Router();
 
+// 브라우저 새로고침시마다 작동하는 코드
+router.get('/', async (req, res, next) => {
+  // GET /user 매번 사용자 정보 복구
+  try {
+    if (req.user) {
+      // 기존이의 로그인과 동일하게 사용자의 모든 정보 load
+      const fullUserWithoutPassword = await User.findOne({
+        where: { id: req.user.id },
+        attributes: { exclude: ['password'] },
+        include: [
+          {
+            model: Post,
+            attributes: ['id'],
+          },
+          {
+            model: User,
+            as: 'Followings',
+            attributes: ['id'],
+          },
+          {
+            model: User,
+            as: 'Followers',
+            attributes: ['id'],
+          },
+        ],
+      });
+
+      res.status(200).json(fullUserWithoutPassword);
+    } else {
+      // 정보가 없으면
+      res.status(200).json(null);
+    }
+  } catch (err) {
+    console.error(err);
+    next(error);
+  }
+});
+
 router.post('/login', isNotLoggedIn, (req, res, next) => {
   // 미들 웨어 확장 😱 - 서버에러, 성공, 클라이언트 에러
   passport.authenticate('local', (err, user, info) => {
@@ -37,14 +75,17 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
         include: [
           {
             model: Post,
+            attributes: ['id'],
           },
           {
             model: User,
             as: 'Followings',
+            attributes: ['id'],
           },
           {
             model: User,
             as: 'Followers',
+            attributes: ['id'],
           },
         ],
       });

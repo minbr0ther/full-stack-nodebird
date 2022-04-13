@@ -23,7 +23,33 @@ import {
   REMOVE_POST_REQUEST,
   REMOVE_POST_SUCCESS,
 } from '../reducers/post';
-import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from '../reducers/user';
+import {
+  ADD_POST_TO_ME,
+  LOAD_MY_INFO_FAILURE,
+  LOAD_MY_INFO_REQUEST,
+  LOAD_MY_INFO_SUCCESS,
+  REMOVE_POST_OF_ME,
+} from '../reducers/user';
+
+function loadMyInfoAPI() {
+  return axios.get('/user');
+}
+
+function* loadMyInfo() {
+  try {
+    yield delay(1000);
+    const result = yield call(loadMyInfoAPI);
+    yield put({
+      type: LOAD_MY_INFO_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: LOAD_MY_INFO_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
 
 // function loadPostsAPI(data) {
 //   return axios.post('/api/post', data);
@@ -68,9 +94,9 @@ function* addPost(action) {
   }
 }
 
-function removePostAPI(data) {
-  return axios.delete('/api/post', data);
-}
+// function removePostAPI(data) {
+//   return axios.delete('/api/post', data);
+// }
 
 function* removePost(action) {
   try {
@@ -111,6 +137,10 @@ function* addComment(action) {
   }
 }
 
+function* watchLoadMyInfo() {
+  yield throttle(5000, LOAD_MY_INFO_REQUEST, loadMyInfo);
+}
+
 function* watchLoadPosts() {
   yield throttle(5000, LOAD_POSTS_REQUEST, loadPosts);
 }
@@ -129,6 +159,7 @@ function* watchAddComment() {
 
 export default function* postSaga() {
   yield all([
+    fork(watchLoadMyInfo),
     fork(watchAddPost),
     fork(watchLoadPosts),
     fork(watchRemovePost),
