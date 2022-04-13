@@ -25,7 +25,12 @@ passportConfig();
 
 // use의 뜻 => express 서버에 '미들웨어'를 장착
 // 🚨 약간 import 느낌이라 상단에 적어주는게 좋음
-app.use(cors()); // 모든 요청에 대해서 cors 허용
+app.use(
+  cors({
+    origin: 'http://localhost:3060',
+    credentials: true,
+  }),
+); // 모든 요청에 대해서 cors 허용
 // json => json형식을 req.body에 넣어주는 역할
 app.use(express.json());
 // urlencoded => (보통 form data) req.body에 넣어주는 역할

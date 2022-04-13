@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { Post } = require('../models');
+const { Post, Image, Comment } = require('../models');
 const { isLoggedIn } = require('./middlewares');
 
 const router = express.Router();
@@ -10,7 +10,24 @@ router.post('/', isLoggedIn, async (req, res) => {
       content: req.body.content,
       UserId: req.user.id,
     });
-    res.status(201).json(post);
+
+    // post에 아직 Image나 추가 정보가 없기 때문에 보강해준다
+    const fullPost = await Post.findOne({
+      where: { id: post.id },
+      include: [
+        {
+          model: Image,
+        },
+        {
+          model: Comment,
+        },
+        {
+          model: User,
+        },
+      ],
+    });
+
+    res.status(201).json(fullPost);
   } catch (err) {
     console.error(err);
     next(error);
