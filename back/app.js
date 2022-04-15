@@ -4,8 +4,10 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const dotenv = require('dotenv');
+const morgan = require('morgan');
 
 const postRouter = require('./routes/post');
+const postsRouter = require('./routes/posts');
 const userRouter = require('./routes/user');
 const db = require('./models');
 const passportConfig = require('./passport');
@@ -25,9 +27,10 @@ passportConfig();
 
 // use의 뜻 => express 서버에 '미들웨어'를 장착
 // 🚨 약간 import 느낌이라 상단에 적어주는게 좋음
+app.use(morgan('dev'));
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: 'http://localhost:3060',
     credentials: true,
   }),
 ); // 모든 요청에 대해서 cors 허용
@@ -54,19 +57,8 @@ app.get('/', (req, res) => {
   res.send('hello express');
 });
 
-app.get('/api', (req, res) => {
-  res.send('hello api');
-});
-
-app.get('/api/posts', (req, res) => {
-  res.json([
-    { id: 1, content: 'hello' },
-    { id: 1, content: 'hello' },
-    { id: 1, content: 'hello' },
-  ]);
-});
-
 app.use('/post', postRouter); // 라우터 분리!
+app.use('/posts', postsRouter); // 게시물 로드용
 app.use('/user', userRouter); // 라우터 분리!
 
 // 에러처리 미들웨어 자리

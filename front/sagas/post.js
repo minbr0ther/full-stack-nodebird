@@ -15,7 +15,6 @@ import {
   ADD_POST_FAILURE,
   ADD_POST_REQUEST,
   ADD_POST_SUCCESS,
-  generateDummyPost,
   LOAD_POSTS_FAILURE,
   LOAD_POSTS_REQUEST,
   LOAD_POSTS_SUCCESS,
@@ -37,13 +36,13 @@ function loadMyInfoAPI() {
 
 function* loadMyInfo() {
   try {
-    yield delay(1000);
     const result = yield call(loadMyInfoAPI);
     yield put({
       type: LOAD_MY_INFO_SUCCESS,
       data: result.data,
     });
   } catch (err) {
+    console.log(err);
     yield put({
       type: LOAD_MY_INFO_FAILURE,
       data: err.response.data,
@@ -51,19 +50,19 @@ function* loadMyInfo() {
   }
 }
 
-// function loadPostsAPI(data) {
-//   return axios.post('/api/post', data);
-// }
+function loadPostsAPI(data) {
+  return axios.get('/posts', data);
+}
 
-function* loadPosts() {
+function* loadPosts(action) {
   try {
-    yield delay(1000);
-    // const result = yield call(loadPostsAPI, action.data);
+    const result = yield call(loadPostsAPI, action.data);
     yield put({
       type: LOAD_POSTS_SUCCESS,
-      data: generateDummyPost(10),
+      data: result.data,
     });
   } catch (err) {
+    console.log(err);
     yield put({
       type: LOAD_POSTS_FAILURE,
       data: err.response.data,
@@ -78,6 +77,7 @@ function addPostAPI(data) {
 function* addPost(action) {
   try {
     const result = yield call(addPostAPI, action.data);
+    console.log(result);
     yield put({
       type: ADD_POST_SUCCESS,
       data: result.data,
@@ -87,6 +87,7 @@ function* addPost(action) {
       data: result.data.id,
     });
   } catch (err) {
+    console.log(err);
     yield put({
       type: ADD_POST_FAILURE,
       data: err.response.data,
@@ -111,6 +112,7 @@ function* removePost(action) {
       data: action.data,
     });
   } catch (err) {
+    console.log(err);
     yield put({
       type: REMOVE_POST_FAILURE,
       data: err.response.data,
@@ -130,6 +132,7 @@ function* addComment(action) {
       data: result.data,
     });
   } catch (err) {
+    console.log(err);
     yield put({
       type: ADD_COMMENT_FAILURE,
       data: err.response.data,

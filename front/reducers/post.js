@@ -1,6 +1,4 @@
-import shortId from 'shortid';
 import produce from 'immer';
-import faker from 'faker';
 
 export const initialState = {
   mainPosts: [],
@@ -19,34 +17,6 @@ export const initialState = {
   addCommentDone: false,
   addCommentError: null,
 };
-
-export const generateDummyPost = (number) =>
-  Array(number)
-    .fill()
-    .map(() => ({
-      id: shortId.generate(),
-      User: {
-        id: shortId.generate(),
-        nickname: faker.name.findName(),
-      },
-      content: faker.lorem.paragraph(),
-      Images: [
-        {
-          src: `https://picsum.photos/id/${Math.floor(
-            Math.random() * 50,
-          )}/300/200`,
-        },
-      ],
-      Comments: [
-        {
-          User: {
-            id: shortId.generate(),
-            nickname: faker.name.findName(),
-          },
-          content: faker.lorem.sentence(),
-        },
-      ],
-    }));
 
 export const LOAD_POSTS_REQUEST = 'LOAD_POSTS_REQUEST';
 export const LOAD_POSTS_SUCCESS = 'LOAD_POSTS_SUCCESS';
@@ -128,7 +98,7 @@ const reducer = (state = initialState, action) =>
         break;
       case ADD_COMMENT_SUCCESS: {
         const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
-        post.Comments.unshift(action.data.content);
+        post.Comments.unshift(action.data); // 🤬 1시간 반 삽질... 덕분에 에러 트레킹 배웠다..
         draft.addCommentLoading = false;
         draft.addCommentDone = true;
         break;

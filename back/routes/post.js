@@ -1,10 +1,10 @@
 const express = require('express');
 
-const { Post, Image, Comment } = require('../models');
+const { Post, Image, Comment, User } = require('../models');
 const { isLoggedIn } = require('./middlewares');
 
 const router = express.Router();
-router.post('/', isLoggedIn, async (req, res) => {
+router.post('/', isLoggedIn, async (req, res, next) => {
   try {
     const post = await Post.create({
       content: req.body.content,
@@ -20,9 +20,16 @@ router.post('/', isLoggedIn, async (req, res) => {
         },
         {
           model: Comment,
+          include: [
+            {
+              model: User,
+              attributes: ['id', 'nickname'],
+            },
+          ],
         },
         {
           model: User,
+          attributes: ['id', 'nickname'],
         },
       ],
     });
@@ -30,28 +37,37 @@ router.post('/', isLoggedIn, async (req, res) => {
     res.status(201).json(fullPost);
   } catch (err) {
     console.error(err);
-    next(error);
+    next(err);
   }
 });
 
 // :postId이 동적으로 바뀜 => parameter
-router.post(`/:postId/comment`, isLoggedIn, async (req, res) => {
+router.post('/:postId/comment', isLoggedIn, async (req, res, next) => {
+  // POST /post/1/comment
   try {
     const post = await Post.findOne({
       where: { id: req.params.postId },
     });
-
-    // 🚨 return 해줘야 한번만 send함
-    if (!post) return res.status(403).send('존재하지 않는 게시글입니다.');
-
+    if (!post) {
+      return res.status(403).send('존재하지 않는 게시글입니다.');
+    }
     const comment = await Comment.create({
       content: req.body.content,
-      PostId: req.params.postId,
+      PostId: parseInt(req.params.postId, 10),
       UserId: req.user.id,
     });
-    res.status(201).json(comment);
-  } catch (err) {
-    console.error(err);
+    const fullComment = await Comment.findOne({
+      where: { id: comment.id },
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'nickname'],
+        },
+      ],
+    });
+    res.status(201).json(fullComment);
+  } catch (error) {
+    console.error(error);
     next(error);
   }
 });
