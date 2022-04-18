@@ -19,9 +19,11 @@ export const initialState = {
   addPostLoading: false,
   addPostDone: false,
   addPostError: null,
+
   removePostLoading: false,
   removePostDone: false,
   removePostError: null,
+
   addCommentLoading: false,
   addCommentDone: false,
   addCommentError: null,
@@ -124,13 +126,16 @@ const reducer = (state = initialState, action) =>
         draft.addPostLoading = false;
         draft.addPostError = action.error;
         break;
+
       case REMOVE_POST_REQUEST:
         draft.removePostLoading = true;
         draft.removePostDone = false;
         draft.removePostError = null;
         break;
       case REMOVE_POST_SUCCESS:
-        draft.mainPosts = draft.mainPosts.filter((v) => v.id !== action.data);
+        draft.mainPosts = draft.mainPosts.filter(
+          (v) => v.id !== action.data.PostId,
+        );
         draft.removePostLoading = false;
         draft.removePostDone = true;
         break;
@@ -138,6 +143,7 @@ const reducer = (state = initialState, action) =>
         draft.removePostLoading = false;
         draft.removePostError = action.error;
         break;
+
       case ADD_COMMENT_REQUEST:
         draft.addCommentLoading = true;
         draft.addCommentDone = false;
