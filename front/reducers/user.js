@@ -19,9 +19,11 @@ export const initialState = {
   signUpLoading: false,
   signUpDone: false,
   signUpError: null,
+
   changeNicknameLoading: false,
   changeNicknameDone: false,
   changeNicknameError: null,
+
   me: null,
   signUpData: {},
   loginData: {},
@@ -172,12 +174,14 @@ const reducer = (state = initialState, action) => {
         draft.signUpLoading = false;
         draft.signUpError = action.error;
         break;
+
       case CHANGE_NICKNAME_REQUEST:
         draft.changeNicknameLoading = true;
         draft.changeNicknameDone = false;
         draft.changeNicknameError = null;
         break;
       case CHANGE_NICKNAME_SUCCESS:
+        draft.me.nickname = action.data.nickname;
         draft.changeNicknameLoading = false;
         draft.changeNicknameDone = true;
         break;
@@ -185,6 +189,7 @@ const reducer = (state = initialState, action) => {
         changeNicknameLoading = false;
         changeNicknameError = action.error;
         break;
+
       case ADD_POST_TO_ME:
         draft.me.Posts.unshift({ id: action.data });
         break;
