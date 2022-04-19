@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { all, call, delay, fork, put, takeLatest } from 'redux-saga/effects';
+import { all, call, fork, put, takeLatest } from 'redux-saga/effects';
 import {
   CHANGE_NICKNAME_FAILURE,
   CHANGE_NICKNAME_REQUEST,
@@ -7,6 +7,12 @@ import {
   FOLLOW_FAILURE,
   FOLLOW_REQUEST,
   FOLLOW_SUCCESS,
+  LOAD_FOLLOWERS_FAILURE,
+  LOAD_FOLLOWERS_REQUEST,
+  LOAD_FOLLOWERS_SUCCESS,
+  LOAD_FOLLOWINGS_FAILURE,
+  LOAD_FOLLOWINGS_REQUEST,
+  LOAD_FOLLOWINGS_SUCCESS,
   LOG_IN_FAILURE,
   LOG_IN_REQUEST,
   LOG_IN_SUCCESS,
@@ -20,6 +26,44 @@ import {
   UNFOLLOW_REQUEST,
   UNFOLLOW_SUCCESS,
 } from '../reducers/user';
+
+function loadFollowingsAPI(data) {
+  return axios.get('user/followings', data);
+}
+
+function* loadFollowings(action) {
+  try {
+    const result = yield call(loadFollowingsAPI, action.data);
+    yield put({
+      type: LOAD_FOLLOWINGS_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: LOAD_FOLLOWINGS_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+function loadFollowersAPI(data) {
+  return axios.get('user/followers', data);
+}
+
+function* loadFollowers(action) {
+  try {
+    const result = yield call(loadFollowersAPI, action.data);
+    yield put({
+      type: LOAD_FOLLOWERS_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: LOAD_FOLLOWERS_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
 
 function changeNicknameAPI(data) {
   return axios.patch('user/nickname', { nickname: data });
@@ -61,17 +105,17 @@ function* signUp(action) {
   }
 }
 
-// function followAPI() {
-//   return axios.post('/api/follow');
-// }
+function followAPI(data) {
+  // data: 사용자ID
+  return axios.patch(`/user/${data}/follow`);
+}
 
 function* follow(action) {
   try {
-    yield delay(1000);
-    // const result = yield call(followAPI);
+    const result = yield call(followAPI, action.data);
     yield put({
       type: FOLLOW_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
   } catch (err) {
     yield put({
@@ -81,17 +125,18 @@ function* follow(action) {
   }
 }
 
-// function unfollowAPI() {
-//   return axios.post('/api/unfollow');
-// }
+function unfollowAPI(data) {
+  // data: 사용자ID
+  return axios.delete(`/user/${data}/follow`);
+}
 
 function* unfollow(action) {
   try {
-    yield delay(1000);
-    // const result = yield call(unfollowAPI);
+    const result = yield call(unfollowAPI, action.data);
+    console.log(result);
     yield put({
       type: UNFOLLOW_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
   } catch (err) {
     yield put({
@@ -139,6 +184,14 @@ function* logOut() {
   }
 }
 
+function* watchLoadFollowings() {
+  yield takeLatest(LOAD_FOLLOWINGS_REQUEST, loadFollowings);
+}
+
+function* watchLoadFollowers() {
+  yield takeLatest(LOAD_FOLLOWERS_REQUEST, loadFollowers);
+}
+
 function* watchChangeNickname() {
   yield takeLatest(CHANGE_NICKNAME_REQUEST, changeNickname);
 }
@@ -165,6 +218,8 @@ function* watchSignUp() {
 
 export default function* userSaga() {
   yield all([
+    fork(watchLoadFollowings),
+    fork(watchLoadFollowers),
     fork(watchChangeNickname),
     fork(watchFollow),
     fork(watchUnfollow),

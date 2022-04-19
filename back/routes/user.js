@@ -150,6 +150,71 @@ router.patch('/nickname', isLoggedIn, async (req, res, next) => {
   }
 });
 
+router.patch('/:userId/follow', isLoggedIn, async (req, res, next) => {
+  // PATCH /user/1/follow
+  try {
+    // 먼저 유저가 있는지 알아본다
+    const user = await User.findOne({ where: { id: req.params.userId } });
+    if (!user) {
+      res.status(403).send('유령을 팔로우하려고 하시네요?');
+    }
+    // ORM이 복수인애들은 단수로 만들어줌 (복수로 하면 무조건 됨, 단수로 하면 제로초도 확신이 없음)
+    await user.addFollowers(req.user.id);
+    res.status(200).json({ UserId: parseInt(req.params.userId, 10) });
+  } catch (error) {
+    console.error(err);
+    next(err);
+  }
+});
+
+router.delete('/:userId/follow', isLoggedIn, async (req, res, next) => {
+  // DELETE /user/1/follow
+  try {
+    // 먼저 유저가 있는지 알아본다
+    const user = await User.findOne({ where: { id: req.params.userId } });
+    if (!user) {
+      res.status(403).send('유령을 언팔로우하려고 하시네요?');
+    }
+    await user.removeFollowers(req.user.id);
+    res.status(200).json({ UserId: parseInt(req.params.userId, 10) });
+  } catch (error) {
+    console.error(err);
+    next(err);
+  }
+});
+
+router.get('/followers', isLoggedIn, async (req, res, next) => {
+  // GET /user/followers
+  try {
+    // 본인을 먼저 찾아본다
+    const user = await User.findOne({ where: { id: req.user.id } });
+    if (!user) {
+      res.status(403).send('본인은 유령이신가요?');
+    }
+    const followers = await user.getFollowers();
+    res.status(200).json(followers);
+  } catch (error) {
+    console.error(err);
+    next(err);
+  }
+});
+
+router.get('/followings', isLoggedIn, async (req, res, next) => {
+  // GET /user/followings
+  try {
+    // 본인을 먼저 찾아본다
+    const user = await User.findOne({ where: { id: req.user.id } });
+    if (!user) {
+      res.status(403).send('본인은 유령이신가요?');
+    }
+    const followings = await user.getFollowings();
+    res.status(200).json(followings);
+  } catch (error) {
+    console.error(err);
+    next(err);
+  }
+});
+
 router.post('/logout', isLoggedIn, (req, res) => {
   req.logout();
   req.session.destroy();
