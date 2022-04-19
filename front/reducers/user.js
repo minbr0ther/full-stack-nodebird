@@ -32,6 +32,10 @@ export const initialState = {
   loadFollowingsDone: false,
   loadFollowingsError: null,
 
+  removeFollowerLoading: false,
+  removeFollowerDone: false,
+  removeFollowerError: null,
+
   me: null,
   signUpData: {},
   loginData: {},
@@ -65,6 +69,10 @@ export const UNFOLLOW_REQUEST = 'UNFOLLOW_REQUEST';
 export const UNFOLLOW_SUCCESS = 'UNFOLLOW_SUCCESS';
 export const UNFOLLOW_FAILURE = 'UNFOLLOW_FAILURE';
 
+export const REMOVE_FOLLOWER_REQUEST = 'REMOVE_FOLLOWER_REQUEST';
+export const REMOVE_FOLLOWER_SUCCESS = 'REMOVE_FOLLOWER_SUCCESS';
+export const REMOVE_FOLLOWER_FAILURE = 'REMOVE_FOLLOWER_FAILURE';
+
 export const LOAD_FOLLOWERS_REQUEST = 'LOAD_FOLLOWERS_REQUEST';
 export const LOAD_FOLLOWERS_SUCCESS = 'LOAD_FOLLOWERS_SUCCESS';
 export const LOAD_FOLLOWERS_FAILURE = 'LOAD_FOLLOWERS_FAILURE';
@@ -88,6 +96,23 @@ export const logoutRequestAction = () => ({
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
     switch (action.type) {
+      case REMOVE_FOLLOWER_REQUEST:
+        draft.removeFollowerLoading = true;
+        draft.removeFollowerError = null;
+        draft.removeFollowerDone = false;
+        break;
+      case REMOVE_FOLLOWER_SUCCESS:
+        draft.removeFollowerLoading = false;
+        draft.removeFollowerDone = true;
+        draft.me.Followers = draft.me.Followers.filter(
+          (v) => v.id !== action.data.UserId,
+        ); //followings data 넣어주기
+        break;
+      case REMOVE_FOLLOWER_FAILURE:
+        draft.removeFollowerLoading = false;
+        draft.removeFollowerError = action.error;
+        break;
+
       case LOAD_FOLLOWINGS_REQUEST:
         draft.loadFollowingsLoading = true;
         draft.loadFollowingsError = null;

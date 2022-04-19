@@ -167,6 +167,23 @@ router.patch('/:userId/follow', isLoggedIn, async (req, res, next) => {
   }
 });
 
+router.delete('/follower/:userId', isLoggedIn, async (req, res, next) => {
+  // DELETE /follower/1
+  try {
+    // 먼저 유저가 있는지 알아본다
+    const user = await User.findOne({ where: { id: req.params.userId } });
+    if (!user) {
+      res.status(403).send('유령을 차단하려고 하시네요?');
+    }
+    // 그 사람이 나를 끊는다 = 내가 그 사람을 차단한다 (대칭관계)
+    await user.removeFollowings(req.user.id);
+    res.status(200).json({ UserId: parseInt(req.params.userId, 10) });
+  } catch (error) {
+    console.error(err);
+    next(err);
+  }
+});
+
 router.delete('/:userId/follow', isLoggedIn, async (req, res, next) => {
   // DELETE /user/1/follow
   try {

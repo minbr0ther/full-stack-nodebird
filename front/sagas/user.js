@@ -19,6 +19,9 @@ import {
   LOG_OUT_FAILURE,
   LOG_OUT_REQUEST,
   LOG_OUT_SUCCESS,
+  REMOVE_FOLLOWER_FAILURE,
+  REMOVE_FOLLOWER_REQUEST,
+  REMOVE_FOLLOWER_SUCCESS,
   SIGN_UP_FAILURE,
   SIGN_UP_REQUEST,
   SIGN_UP_SUCCESS,
@@ -26,6 +29,26 @@ import {
   UNFOLLOW_REQUEST,
   UNFOLLOW_SUCCESS,
 } from '../reducers/user';
+
+function removeFollowerAPI(data) {
+  // 나의 팔로워의 몇번(팔로워 아이디)를 제거한다
+  return axios.delete(`user/follower/${data}`);
+}
+
+function* removeFollower(action) {
+  try {
+    const result = yield call(removeFollowerAPI, action.data);
+    yield put({
+      type: REMOVE_FOLLOWER_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: REMOVE_FOLLOWER_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
 
 function loadFollowingsAPI(data) {
   return axios.get('user/followings', data);
@@ -184,6 +207,10 @@ function* logOut() {
   }
 }
 
+function* watchRemoveFollower() {
+  yield takeLatest(REMOVE_FOLLOWER_REQUEST, removeFollower);
+}
+
 function* watchLoadFollowings() {
   yield takeLatest(LOAD_FOLLOWINGS_REQUEST, loadFollowings);
 }
@@ -218,6 +245,7 @@ function* watchSignUp() {
 
 export default function* userSaga() {
   yield all([
+    fork(watchRemoveFollower),
     fork(watchLoadFollowings),
     fork(watchLoadFollowers),
     fork(watchChangeNickname),
