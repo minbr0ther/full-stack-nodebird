@@ -15,12 +15,45 @@ try {
   fs.mkdirSync('uploads');
 }
 
-router.post('/', isLoggedIn, async (req, res, next) => {
+const upload = multer({
+  storage: multer.diskStorage({
+    // hdd에 저장한다 -> 나중에 s3로 교체 예정
+    destination(req, file, done) {
+      done(null, 'uploads'); // 폴더명
+    },
+    filename(req, file, done) {
+      // node.js는 업로드시 이름이 동일하면 overwrite 한다
+      // 이름 + 현재 시간을 해서 덮어쓰기를 방지한다!
+      const ext = path.extname(file.originalname); // 확장자 추출(.png)
+      const basename = path.basename(file.originalname, ext); // 제로초
+      done(null, basename + '_' + new Date().getTime() + ext);
+    },
+  }),
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20mb로 제한
+});
+
+// none => 게시글 string 업로드할떄
+router.post('/', isLoggedIn, upload.none(), async (req, res, next) => {
   try {
     const post = await Post.create({
       content: req.body.content,
       UserId: req.user.id,
     });
+
+    if (req.body.image) {
+      // 이미지를 여러개 올리면 배열, 한개 올리면 '문자열'
+      if (Array.isArray(req.body.image)) {
+        // sequelize로 create 해준다, Promise.all로 한방에 실행
+        // db에는 파일 주소만 기록한다
+        const images = await Promise.all(
+          req.body.image.map((image) => Image.create({ src: image })),
+        );
+        await post.addImages(images);
+      } else {
+        const image = await Image.create({ src: req.body.image });
+        await post.addImages(image);
+      }
+    }
 
     // post에 아직 Image나 추가 정보가 없기 때문에 보강해준다
     const fullPost = await Post.findOne({
@@ -55,23 +88,6 @@ router.post('/', isLoggedIn, async (req, res, next) => {
     console.error(err);
     next(err);
   }
-});
-
-const upload = multer({
-  storage: multer.diskStorage({
-    // hdd에 저장한다 -> 나중에 s3로 교체 예정
-    destination(req, file, done) {
-      done(null, 'uploads'); // 폴더명
-    },
-    filename(req, file, done) {
-      // node.js는 업로드시 이름이 동일하면 overwrite 한다
-      // 이름 + 현재 시간을 해서 덮어쓰기를 방지한다!
-      const ext = path.extname(file.originalname); // 확장자 추출(.png)
-      const basename = path.basename(file.originalname, ext); // 제로초
-      done(null, basename + '_' + new Date().getTime() + ext);
-    },
-  }),
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20mb로 제한
 });
 
 // 이미지를 여러장 올릴 수 있도록 array로 한다, 한장이라면? single사용, text라면? none
