@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
     // 게시물과 사용자의 다대다 관계
     // 'Likers'로 db.User의 이름을 변경해준다 (헷갈리지 말라고)
     db.Post.belongsToMany(db.User, { through: 'Like', as: 'Likers' });
-    db.Post.belongsTo(db.Post), { as: 'Retweet' };
+    db.Post.belongsTo(db.Post, { as: 'Retweet' });
   };
   return Post;
 };

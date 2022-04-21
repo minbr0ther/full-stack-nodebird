@@ -16,6 +16,9 @@ import {
   REMOVE_POST_FAILURE,
   REMOVE_POST_REQUEST,
   REMOVE_POST_SUCCESS,
+  RETWEET_FAILURE,
+  RETWEET_REQUEST,
+  RETWEET_SUCCESS,
   UNLIKE_POST_FAILURE,
   UNLIKE_POST_REQUEST,
   UNLIKE_POST_SUCCESS,
@@ -30,6 +33,27 @@ import {
   LOAD_MY_INFO_SUCCESS,
   REMOVE_POST_OF_ME,
 } from '../reducers/user';
+
+function retweetAPI(data) {
+  // formData를 객체로 감싸지 않는다!
+  return axios.post(`/post/${data}/retweet`);
+}
+
+function* retweet(action) {
+  try {
+    const result = yield call(retweetAPI, action.data);
+    yield put({
+      type: RETWEET_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: RETWEET_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
 
 function uploadImagesAPI(data) {
   // formData를 객체로 감싸지 않는다!
@@ -202,6 +226,10 @@ function* addComment(action) {
   }
 }
 
+function* watchRetweet() {
+  yield takeLatest(RETWEET_REQUEST, retweet);
+}
+
 function* watchUploadImages() {
   yield takeLatest(UPLOAD_IMAGES_REQUEST, uploadImages);
 }
@@ -236,6 +264,7 @@ function* watchAddComment() {
 
 export default function* postSaga() {
   yield all([
+    fork(watchRetweet),
     fork(watchUploadImages),
     fork(watchLikePost),
     fork(watchUnlikePost),

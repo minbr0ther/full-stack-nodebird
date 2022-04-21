@@ -110,6 +110,95 @@ router.post('/images', isLoggedIn, upload.array('image'), (req, res, next) => {
   res.json(req.files.map((v) => v.filename));
 });
 
+router.post('/:postId/retweet', isLoggedIn, async (req, res, next) => {
+  // POST /post/1/retweet
+  try {
+    const post = await Post.findOne({
+      where: { id: req.params.postId },
+      include: [
+        {
+          model: Post,
+          as: 'Retweet',
+        },
+      ],
+    });
+    if (!post) {
+      return res.status(403).send('존재하지 않는 게시글입니다.');
+    }
+
+    if (
+      // 자기 게시물 리트윗 막기
+      // 자기 게시물을 리트윗 한 것을 리트윗 하는 것 막기 👀
+      req.user.id === post.userId ||
+      (post.Retweet && post.Retweet.UserId === req.user.id)
+    ) {
+      return res.status(403).send('자신의 글은 리트윗할 수 없습니다.');
+    }
+
+    // 리트윗 한 아이디를 찾고 없으면 포스트의 아이디를 사용한다.
+    const retweetTargetId = post.RetweetId || post.id;
+    const exPost = await Post.findOne({
+      where: { UserId: req.user.id, RetweetId: retweetTargetId },
+    });
+    if (exPost) {
+      return res.status(403).send('이미 리트윗 했습니다.');
+    }
+
+    const retweet = await Post.create({
+      UserId: req.user.id,
+      RetweetId: retweetTargetId,
+      content: 'retweet',
+    });
+
+    // 정보가 많아지면서 점점 불러오는게 느려진다
+    // 댓글과 같이 늦게 가져와도 되는거는 나눠서 가져온다
+    const retweetWithPrevPost = await Post.findOne({
+      where: { id: retweet.id },
+      include: [
+        {
+          model: Post,
+          as: 'Retweet',
+          include: [
+            {
+              model: User,
+              attributes: ['id', 'nickname'],
+            },
+            {
+              model: Image,
+            },
+          ],
+        },
+        {
+          model: User,
+          attributes: ['id', 'nickname'],
+        },
+        {
+          model: Image,
+        },
+        {
+          model: Comment,
+          include: [
+            {
+              model: User,
+              attributes: ['id', 'nickname'],
+            },
+          ],
+        },
+        {
+          model: User,
+          as: 'Likers',
+          attributes: ['id'],
+        },
+      ],
+    });
+
+    res.status(201).json(retweetWithPrevPost);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
 // :postId이 동적으로 바뀜 => parameter
 router.post('/:postId/comment', isLoggedIn, async (req, res, next) => {
   // POST /post/1/comment
