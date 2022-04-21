@@ -19,6 +19,9 @@ import {
   UNLIKE_POST_FAILURE,
   UNLIKE_POST_REQUEST,
   UNLIKE_POST_SUCCESS,
+  UPLOAD_IMAGES_FAILURE,
+  UPLOAD_IMAGES_REQUEST,
+  UPLOAD_IMAGES_SUCCESS,
 } from '../reducers/post';
 import {
   ADD_POST_TO_ME,
@@ -27,6 +30,27 @@ import {
   LOAD_MY_INFO_SUCCESS,
   REMOVE_POST_OF_ME,
 } from '../reducers/user';
+
+function uploadImagesAPI(data) {
+  // formData를 객체로 감싸지 않는다!
+  return axios.post('/post/images', data);
+}
+
+function* uploadImages(action) {
+  try {
+    const result = yield call(uploadImagesAPI, action.data);
+    yield put({
+      type: UPLOAD_IMAGES_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: UPLOAD_IMAGES_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
 
 function likePostAPI(data) {
   return axios.patch(`/post/${data}/like`);
@@ -177,6 +201,10 @@ function* addComment(action) {
   }
 }
 
+function* watchUploadImages() {
+  yield takeLatest(UPLOAD_IMAGES_REQUEST, uploadImages);
+}
+
 function* watchLikePost() {
   yield takeLatest(LIKE_POST_REQUEST, likePost);
 }
@@ -207,6 +235,7 @@ function* watchAddComment() {
 
 export default function* postSaga() {
   yield all([
+    fork(watchUploadImages),
     fork(watchLikePost),
     fork(watchUnlikePost),
     fork(watchLoadMyInfo),

@@ -1,9 +1,20 @@
 const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const { Post, Image, Comment, User } = require('../models');
 const { isLoggedIn } = require('./middlewares');
 
 const router = express.Router();
+
+try {
+  fs.accessSync('uploads');
+} catch (error) {
+  console.log('uploads 폴더가 없으므로 생성합니다.');
+  fs.mkdirSync('uploads');
+}
+
 router.post('/', isLoggedIn, async (req, res, next) => {
   try {
     const post = await Post.create({
@@ -45,6 +56,36 @@ router.post('/', isLoggedIn, async (req, res, next) => {
     next(err);
   }
 });
+
+const upload = multer({
+  storage: multer.diskStorage({
+    // hdd에 저장한다 -> 나중에 s3로 교체 예정
+    destination(req, file, done) {
+      done(null, 'uploads');
+    },
+    filename(req, file, done) {
+      // node.js는 업로드시 이름이 동일하면 overwrite 한다
+      // 이름 + 현재 시간을 해서 덮어쓰기를 방지한다!
+      const ext = path.extname(file.originalname); // 확장자 추출(.png)
+      const basename = path.basename(file.originalname, ext); // 제로초
+      done(null, basename + '_' + new Date().getTime() + ext);
+    },
+  }),
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20mb로 제한
+});
+
+// 이미지를 여러장 올릴 수 있도록 array로 한다, 한장이라면? single사용, text라면? none
+// 순서대로 미들웨어를 거치고 업로드 후에 콜백함수가 작동한다
+router.post(
+  '/images',
+  isLoggedIn,
+  upload.array('image'),
+  async (req, res, next) => {
+    // POST /post/images
+    console.log(req.files);
+    res.json(req.files.map((v) => v.filename));
+  },
+);
 
 // :postId이 동적으로 바뀜 => parameter
 router.post('/:postId/comment', isLoggedIn, async (req, res, next) => {
