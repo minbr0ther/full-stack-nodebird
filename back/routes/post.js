@@ -61,7 +61,7 @@ const upload = multer({
   storage: multer.diskStorage({
     // hdd에 저장한다 -> 나중에 s3로 교체 예정
     destination(req, file, done) {
-      done(null, 'uploads');
+      done(null, 'uploads'); // 폴더명
     },
     filename(req, file, done) {
       // node.js는 업로드시 이름이 동일하면 overwrite 한다
@@ -76,16 +76,11 @@ const upload = multer({
 
 // 이미지를 여러장 올릴 수 있도록 array로 한다, 한장이라면? single사용, text라면? none
 // 순서대로 미들웨어를 거치고 업로드 후에 콜백함수가 작동한다
-router.post(
-  '/images',
-  isLoggedIn,
-  upload.array('image'),
-  async (req, res, next) => {
-    // POST /post/images
-    console.log(req.files);
-    res.json(req.files.map((v) => v.filename));
-  },
-);
+router.post('/images', isLoggedIn, upload.array('image'), (req, res, next) => {
+  // POST /post/images
+  console.log(req.files);
+  res.json(req.files.map((v) => v.filename));
+});
 
 // :postId이 동적으로 바뀜 => parameter
 router.post('/:postId/comment', isLoggedIn, async (req, res, next) => {

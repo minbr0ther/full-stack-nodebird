@@ -40,7 +40,8 @@ const PostForm = () => {
     // multipart로 보내야 Multer가 처리한다
     const imageFormData = new FormData();
 
-    // e.target.files 안에 forEach가 없기 때문에, call을 통해서 빌려쓴다?
+    // e.target.files가 배열이 아니끼 때문에
+    // 안에 forEach가 없기 때문에, call을 통해서 빌려쓴다?
     [].forEach.call(e.target.files, (f) => {
       imageFormData.append('image', f);
     });
@@ -75,7 +76,12 @@ const PostForm = () => {
         <div>
           {imagePaths.map((v) => (
             <div key={v} style={{ display: 'inline-block' }}>
-              <img src={v} style={{ width: '200px' }} alt={v} />
+              {/* 프론트 서버 주소에서 백 주소로 변경! */}
+              <img
+                src={`http://localhost:3065/${v}`}
+                style={{ width: '200px' }}
+                alt={v}
+              />
               <div>
                 <Button>제거</Button>
               </div>

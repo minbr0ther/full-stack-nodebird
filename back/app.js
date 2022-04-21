@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
+const path = require('path');
 
 const postRouter = require('./routes/post');
 const postsRouter = require('./routes/posts');
@@ -34,6 +35,12 @@ app.use(
     credentials: true,
   }),
 ); // 모든 요청에 대해서 cors 허용
+
+// 경로를 자동으로 만들어줌 (운영체제에 따라서 자동으로)
+// front에서는 back의 폴더 구조를 모른다 => 보안에 장점
+// 실제 주소: /uploads/사진.png
+// 숨겨진 주소: /사진.png
+app.use('/', express.static(path.join(__dirname, 'uploads')));
 // json => json형식을 req.body에 넣어주는 역할
 app.use(express.json());
 // urlencoded => (보통 form data) req.body에 넣어주는 역할
