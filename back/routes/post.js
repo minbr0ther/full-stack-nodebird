@@ -3,7 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-const { Post, Image, Comment, User } = require('../models');
+const { Post, Image, Comment, User, Hashtag } = require('../models');
 const { isLoggedIn } = require('./middlewares');
 
 const router = express.Router();
@@ -39,6 +39,18 @@ router.post('/', isLoggedIn, upload.none(), async (req, res, next) => {
       content: req.body.content,
       UserId: req.user.id,
     });
+
+    const hashtags = req.body.content.match(/#[^\s#]+/g);
+    if (hashtags) {
+      const result = await Promise.all(
+        hashtags.map((tag) =>
+          // slice(1) => hashtag 제거
+          // 찾아보고 있으면 가져오고, 없으면 생성한다
+          Hashtag.findOrCreate({ where: { name: tag.slice(1).toLowerCase() } }),
+        ),
+      ); // [[노드, true], [리액트, true]] : 두번째 값이 생성된건지 불러와진건지 알려줌
+      await post.addHashtags(result.map((v) => v[0]));
+    }
 
     if (req.body.image) {
       // 이미지를 여러개 올리면 배열, 한개 올리면 '문자열'
