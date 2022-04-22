@@ -158,8 +158,10 @@ const reducer = (state = initialState, action) =>
       case LOAD_POSTS_SUCCESS:
         draft.loadPostsLoading = false;
         draft.loadPostsDone = true;
-        draft.mainPosts = action.data.concat(draft.mainPosts);
-        draft.hasMorePosts = draft.mainPosts.length < 50;
+        draft.mainPosts = draft.mainPosts.concat(action.data);
+        // 다음에 불러올 것이 10개가 꽉차있다면 true
+        // 10의 단위더라도 한 번의 낭비는 발생해도 괜찮다.
+        draft.hasMorePosts = action.data.length === 10;
         break;
       case LOAD_POSTS_FAILURE:
         draft.loadPostsLoading = false;

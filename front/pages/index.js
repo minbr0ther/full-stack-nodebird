@@ -37,8 +37,11 @@ const Home = () => {
       ) {
         // 이미 추가로 로딩을 하고 있을때는 무시한다
         if (hasMorePosts && !loadPostsLoading) {
+          const lastId = mainPosts[mainPosts.length - 1]?.id;
+          console.log(lastId);
           dispatch({
             type: LOAD_POSTS_REQUEST,
+            lastId,
           });
         }
       }

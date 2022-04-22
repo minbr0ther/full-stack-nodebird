@@ -136,13 +136,15 @@ function* loadMyInfo() {
   }
 }
 
-function loadPostsAPI(data) {
-  return axios.get('/posts', data);
+function loadPostsAPI(lastId) {
+  // data caching 가능, lastId가 없으면 0
+  return axios.get(`/posts?lastId=${lastId || 0}`);
 }
 
 function* loadPosts(action) {
   try {
-    const result = yield call(loadPostsAPI, action.data);
+    console.log(action.lastId);
+    const result = yield call(loadPostsAPI, action.lastId);
     yield put({
       type: LOAD_POSTS_SUCCESS,
       data: result.data,
