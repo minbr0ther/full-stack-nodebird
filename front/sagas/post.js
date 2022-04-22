@@ -143,7 +143,6 @@ function loadPostsAPI(lastId) {
 
 function* loadPosts(action) {
   try {
-    console.log(action.lastId);
     const result = yield call(loadPostsAPI, action.lastId);
     yield put({
       type: LOAD_POSTS_SUCCESS,
