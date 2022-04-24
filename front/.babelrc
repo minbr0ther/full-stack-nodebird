@@ -1,0 +1,12 @@
+{
+  "presets": ["next/babel"],
+  "plugins": [
+    [
+      "babel-plugin-styled-components",
+      {
+        "ssr": true,
+        "displayName": true // 개발모드에서 해시값으로 변경된 클래스네임 되돌리기
+      }
+    ]
+  ]
+}

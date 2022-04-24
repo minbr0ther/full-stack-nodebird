@@ -30,12 +30,13 @@ router.get('/:userId', async (req, res, next) => {
       ],
     });
     if (fullUserWithoutPassword) {
+      // sequelize에서 보준 데이터는 json이 아님
       // sequelize로 작성된 것을 우리가 편집할 수 있도록 변경
-      // 개인정보 침해 예방
       const data = fullUserWithoutPassword.toJSON();
       data.Posts = data.Posts.length;
       data.Followers = data.Followers.length;
       data.Followings = data.Followings.length;
+      // 개인정보 침해 예방
       res.status(200).json(data);
     } else {
       res.status(404).json('존재하지 않는 사용자입니다.');

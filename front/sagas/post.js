@@ -13,6 +13,9 @@ import {
   LOAD_POSTS_FAILURE,
   LOAD_POSTS_REQUEST,
   LOAD_POSTS_SUCCESS,
+  LOAD_POST_FAILURE,
+  LOAD_POST_REQUEST,
+  LOAD_POST_SUCCESS,
   REMOVE_POST_FAILURE,
   REMOVE_POST_REQUEST,
   REMOVE_POST_SUCCESS,
@@ -136,6 +139,27 @@ function* loadMyInfo() {
   }
 }
 
+function loadPostAPI(data) {
+  // data caching 가능, lastId가 없으면 0
+  return axios.get(`/post/${data}`);
+}
+
+function* loadPost(action) {
+  try {
+    const result = yield call(loadPostAPI, action.data);
+    yield put({
+      type: LOAD_POST_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.log(err);
+    yield put({
+      type: LOAD_POST_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
 function loadPostsAPI(lastId) {
   // data caching 가능, lastId가 없으면 0
   return axios.get(`/posts?lastId=${lastId || 0}`);
@@ -247,6 +271,10 @@ function* watchLoadMyInfo() {
   yield throttle(5000, LOAD_MY_INFO_REQUEST, loadMyInfo);
 }
 
+function* watchLoadPost() {
+  yield takeLatest(LOAD_POST_REQUEST, loadPost);
+}
+
 function* watchLoadPosts() {
   yield throttle(5000, LOAD_POSTS_REQUEST, loadPosts);
 }
@@ -271,6 +299,7 @@ export default function* postSaga() {
     fork(watchUnlikePost),
     fork(watchLoadMyInfo),
     fork(watchAddPost),
+    fork(watchLoadPost),
     fork(watchLoadPosts),
     fork(watchRemovePost),
     fork(watchAddComment),
