@@ -168,7 +168,9 @@ function* loadPost(action) {
 
 function loadHashtagPostsAPI(data, lastId) {
   // data caching 가능, lastId가 없으면 0
-  return axios.get(`/hashtag/${data}?lastId=${lastId || 0}`);
+  return axios.get(
+    `/hashtag/${encodeURIComponent(data)}?lastId=${lastId || 0}`,
+  );
 }
 
 function* loadHashtagPosts(action) {

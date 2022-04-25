@@ -10,6 +10,7 @@ const path = require('path');
 const postRouter = require('./routes/post');
 const postsRouter = require('./routes/posts');
 const userRouter = require('./routes/user');
+const hashtagRouter = require('./routes/hashtag');
 const db = require('./models');
 const passportConfig = require('./passport');
 
@@ -66,6 +67,7 @@ app.get('/', (req, res) => {
 
 app.use('/post', postRouter); // 라우터 분리!
 app.use('/posts', postsRouter); // 게시물 로드용
+app.use('/hashtag', hashtagRouter); // 게시물 로드용
 app.use('/user', userRouter); // 라우터 분리!
 
 // 에러처리 미들웨어 자리
