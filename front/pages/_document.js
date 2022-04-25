@@ -1,7 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
-import Document, { Html, Main, NextScript } from 'next/document';
-import Head from 'next/head';
+import Document, { Html, Head, Main, NextScript } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
 
 export default class MyDocument extends Document {
@@ -17,6 +16,7 @@ export default class MyDocument extends Document {
           enhanceApp: (App) => (props) =>
             sheet.collectStyles(<App {...props} />),
         });
+
       const initialProps = await Document.getInitialProps(ctx);
       return {
         ...initialProps,
@@ -27,22 +27,23 @@ export default class MyDocument extends Document {
           </>
         ),
       };
-    } catch (error) {
-      console.error(error);
     } finally {
       sheet.seal();
     }
   }
 
   render() {
-    <Html>
-      <Head />
-      <body>
-        {/* IE에서 작동을 원하면 polyfill에서 원하는 링크를 만들어 사용한다 */}
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=default%2Ces2015%2Ces2022%2Ces2016%2Ces2017%2Ces2018%2Ces2019%2Ces2020%2Ces2021" />
-        <Main />
-        <NextScript />
-      </body>
-    </Html>;
+    return (
+      <Html>
+        <Head />
+        <body>
+          {/* IE에서 작동을 원하면 polyfill에서 원하는 링크를 만들어 사용한다 */}
+          <script src="https://polyfill.io/v3/polyfill.min.js?features=default%2Ces2015%2Ces2022%2Ces2016%2Ces2017%2Ces2018%2Ces2019%2Ces2020%2Ces2021" />
+
+          <Main />
+          <NextScript />
+        </body>
+      </Html>
+    );
   }
 }
